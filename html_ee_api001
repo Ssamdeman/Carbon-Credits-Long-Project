@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockCarbon Tool</title>
+    <link rel="stylesheet" href="static/styles/style.css">
+</head>
+
+<body>
+    <header id="header">
+        <div class="logo-container">
+            <img src="static/images/BlockCarbon.png" alt="BlockCarbon Logo" id="logo">
+        </div>
+        <h1>BlockCarbon</h1>
+    </header>
+
+    <section id="coordinates-input">
+        <h2>Enter Project Area Coordinates</h2>
+        <form id="coordinate-form">
+            <label>Top-Left Coordinates:</label>
+            <div class="input-group">
+                <input type="text" id="top-left-latitude" placeholder="Latitude">
+                <input type="text" id="top-left-longitude" placeholder="Longitude">
+            </div>
+
+            <label>Bottom-Right Coordinates:</label>
+            <div class="input-group">
+                <input type="text" id="bottom-right-latitude" placeholder="Latitude">
+                <input type="text" id="bottom-right-longitude" placeholder="Longitude">
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </section>
+
+    <section id="satellite-image-section" style="display: none;">
+        <div id="coordinates-display"></div>
+        <img id="satellite-image" src="static/images/amazon_rain_forest.jpg" alt="Satellite View">
+    </section>
+
+    <script src="{{ url_for('static', filename='scripts/script.js') }}" defer></script>
+
+</html>
