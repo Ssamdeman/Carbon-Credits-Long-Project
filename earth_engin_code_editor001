@@ -42,7 +42,7 @@ Map.addLayer(composite.clip(rectangle), rgbVis, 'Satellite Imagery');
 // Add the rectangle to the map for reference
 //Map.addLayer(rectangle, {color: 'blue', opacity: 0.5}, 'Rectangle Area'); // Add the rectangle in blue with some transparency
 
-// Optionally, add markers for the corner points
+// add markers for the corner points
 Map.addLayer(point1, {color: 'red'}, 'Point 1'); // Add Point 1 in red
 Map.addLayer(point2, {color: 'green'}, 'Point 2'); // Add Point 2 in green
 
