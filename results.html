@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockCarbon Tool - Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+
+<body>
+    <header id="header">
+        <div class="left-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/BlockCarbon.png') }}" alt="BlockCarbon Logo" id="logo">
+            </div>
+            <h1><a href="{{ url_for('index') }}" class="header-link">BlockCarbon</a></h1>
+        </div>
+        <div class="developer-attribution">
+            <span>Developed by Students at UMB</span>
+        </div>
+    </header>
+
+    <hr class="header-line">
+
+    <section id="results-section">
+        <div class="layout-container">
+            <div id="coordinates-display" class="coordinates-box">
+                <h3>Coordinates:</h3>
+                <p>Top-Left: ({{ top_lat }}, {{ left_lon }})</p>
+                <p>Bottom-Right: ({{ bottom_lat }}, {{ right_lon }})</p>
+            </div>
+
+            <div class="image-container">
+                <div class="image-carousel">
+                    <button id="prev-button">&#9664;</button>
+                    <img id="satellite-image" src="{{ image_url }}" alt="Satellite View"
+                        data-satellite-url="{{ image_url }}" data-landcover-url="{{ landcover_image_url }}">
+                    <button id="next-button">&#9654;</button>
+                </div>
+
+                <div id="legend" class="legend">
+                    <h3>Land Cover Legend</h3>
+                    <div id="legend-items">
+                        {% for key, class_info in landcover_classes.items() %}
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: {{ class_info.color }};"></span>
+                            <span class="legend-label">
+                                {{ class_info.name }} - {{ landcover_areas[class_info.name] | round(2) }} ha
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        <!-- Time series area display -->
+        <div id="time-series">
+            <h3>Land Cover Areas Over Time (ha)</h3>
+            <div class="time-series-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            {% for class_info in landcover_classes.values() %}
+                            <th>{{ class_info.name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for month, areas in areas_collection.items() %}
+                        <tr>
+                            <td>{{ month }}</td>
+                            {% for class_info in landcover_classes.values() %}
+                            <td>{{ areas[class_info.name] | round(2) }} ha</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='scripts/script.js') }}" defer></script>
+</body>
+
+</html>
