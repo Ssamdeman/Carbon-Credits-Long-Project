@@ -1,0 +1,69 @@
+from flask import Flask, render_template, request, jsonify, send_file
+import ee
+import os
+
+# Initialize the Earth Engine API
+ee.Initialize()
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')  # Ensure `index.html` exists in the `templates` folder
+
+
+@app.route('/submit_coordinates', methods=['POST'])
+def submit_coordinates():
+    # Get coordinates from the request
+    data = request.get_json()
+    top_left_lat = float(data['top_left_latitude'])
+    top_left_lon = float(data['top_left_longitude'])
+    bottom_right_lat = float(data['bottom_right_latitude'])
+    bottom_right_lon = float(data['bottom_right_longitude'])
+
+    # Define the rectangle geometry
+    rectangle = ee.Geometry.Polygon([
+        [
+            [top_left_lon, top_left_lat],     # Top-left corner
+            [bottom_right_lon, top_left_lat], # Top-right corner
+            [bottom_right_lon, bottom_right_lat], # Bottom-right corner
+            [top_left_lon, bottom_right_lat], # Bottom-left corner
+            [top_left_lon, top_left_lat]      # Closing the polygon
+        ]
+    ])
+
+    # Get the Sentinel-2 image
+    s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') \
+        .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 30)) \
+        .filterDate('2021-01-01', '2021-12-31') \
+        .filterBounds(rectangle) \
+        .median() \
+        .clip(rectangle)
+
+    # Define visualization parameters
+    rgb_vis = {
+        'bands': ['B4', 'B3', 'B2'],
+        'min': 0,
+        'max': 4000
+    }
+
+    # Get the URL of the image
+    url = s2.getThumbURL({
+        'region': rectangle.coordinates().getInfo(),
+        'dimensions': 512,
+        'format': 'png',
+        'min': rgb_vis['min'],
+        'max': rgb_vis['max'],
+        'bands': rgb_vis['bands']
+    })
+
+    return jsonify({
+        'image_url': url,
+        'top_left_latitude': top_left_lat,
+        'top_left_longitude': top_left_lon,
+        'bottom_right_latitude': bottom_right_lat,
+        'bottom_right_longitude': bottom_right_lon
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True)
