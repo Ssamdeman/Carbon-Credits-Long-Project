@@ -5,41 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlockCarbon Tool</title>
-    <link rel="stylesheet" href="static/styles/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 </head>
 
 <body>
     <header id="header">
-        <div class="logo-container">
-            <img src="static/images/BlockCarbon.png" alt="BlockCarbon Logo" id="logo">
+        <div class="left-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/BlockCarbon.png') }}" alt="BlockCarbon Logo" id="logo">
+            </div>
+            <h1><a href="{{ url_for('index') }}" class="header-link">BlockCarbon</a></h1>
         </div>
-        <h1>BlockCarbon</h1>
+        <div class="developer-attribution">
+            <span>Developed by Students at UMB</span>
+        </div>
     </header>
+
+    <hr class="header-line">
 
     <section id="coordinates-input">
         <h2>Enter Project Area Coordinates</h2>
-        <form id="coordinate-form">
+        <form id="coordinate-form" action="{{ url_for('submit_coordinates') }}" method="POST">
             <label>Top-Left Coordinates:</label>
             <div class="input-group">
-                <input type="text" id="top-left-latitude" placeholder="Latitude">
-                <input type="text" id="top-left-longitude" placeholder="Longitude">
+                <input type="number" step="any" name="top_left_latitude" placeholder="Latitude" required>
+                <input type="number" step="any" name="top_left_longitude" placeholder="Longitude" required>
             </div>
 
             <label>Bottom-Right Coordinates:</label>
             <div class="input-group">
-                <input type="text" id="bottom-right-latitude" placeholder="Latitude">
-                <input type="text" id="bottom-right-longitude" placeholder="Longitude">
+                <input type="number" step="any" name="bottom_right_latitude" placeholder="Latitude" required>
+                <input type="number" step="any" name="bottom_right_longitude" placeholder="Longitude" required>
             </div>
 
             <button type="submit">Submit</button>
         </form>
     </section>
-
-    <section id="satellite-image-section" style="display: none;">
-        <div id="coordinates-display"></div>
-        <img id="satellite-image" src="static/images/amazon_rain_forest.jpg" alt="Satellite View">
-    </section>
-
-    <script src="{{ url_for('static', filename='scripts/script.js') }}" defer></script>
+</body>
 
 </html>
