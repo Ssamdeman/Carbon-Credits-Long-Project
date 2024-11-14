@@ -9,7 +9,7 @@ var point2 = ee.Geometry.Point([-71.135000, 42.415000]); // Second point
 var coords1 = point1.coordinates();
 var coords2 = point2.coordinates();
 
-// Create a rectangle (polygon) from the two points
+//   Create a rectangle from the two points
 var rectangle = ee.Geometry.Polygon([
   [
     [coords1.get(0), coords1.get(1)], // Bottom left
@@ -20,26 +20,26 @@ var rectangle = ee.Geometry.Polygon([
   ]
 ]);
 
-// Fetch Sentinel-2 imagery for the defined rectangle
+// Fetch Sentinel-2 image based on rectangle
 var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
   .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 30))
   .filter(ee.Filter.date('2021-01-01', '2021-12-31')) // Adjust date range as needed
   .filterBounds(rectangle);
 
-// Get the median image from the filtered collection
+// Get the median image from the filtered collection (deals with clouds clarity as well)
 var composite = s2.median();
 
-// Define visualization parameters for RGB bands
+// Define visualization layer's colors
 var rgbVis = {
   bands: ['B4', 'B3', 'B2'], // Red, Green, Blue bands
   min: 0,
   max: 3000,
 };
 
-// Add the satellite image layer clipped to the rectangle
+// Add the satellite image layer as a overlay
 Map.addLayer(composite.clip(rectangle), rgbVis, 'Satellite Imagery');
 
-// Add the rectangle to the map for reference
+// Add the rectangle to the map
 //Map.addLayer(rectangle, {color: 'blue', opacity: 0.5}, 'Rectangle Area'); // Add the rectangle in blue with some transparency
 
 // add markers for the corner points
