@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockCarbon Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+
+<body>
+    <header id="header">
+        <div class="left-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/BlockCarbon.png') }}" alt="BlockCarbon Logo" id="logo">
+            </div>
+            <h1><a href="{{ url_for('index') }}" class="header-link">BlockCarbon</a></h1>
+        </div>
+        <div class="developer-attribution">
+            <span>Developed by Students at UMB</span>
+        </div>
+    </header>
+
+    <hr class="header-line">
+
+    <section id="coordinates-input">
+        <h2>Enter Project Area Coordinates</h2>
+        <form id="coordinate-form" action="{{ url_for('submit_coordinates') }}" method="POST">
+            <label>Top-Left Coordinates:</label>
+            <div class="input-group">
+                <input type="number" step="any" name="top_left_latitude" placeholder="Latitude" required>
+                <input type="number" step="any" name="top_left_longitude" placeholder="Longitude" required>
+            </div>
+
+            <label>Bottom-Right Coordinates:</label>
+            <div class="input-group">
+                <input type="number" step="any" name="bottom_right_latitude" placeholder="Latitude" required>
+                <input type="number" step="any" name="bottom_right_longitude" placeholder="Longitude" required>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </section>
+</body>
+
+</html>

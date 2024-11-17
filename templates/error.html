@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockCarbon Tool - Error</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+
+<body>
+    <header id="header">
+        <div class="left-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/BlockCarbon.png') }}" alt="BlockCarbon Logo" id="logo">
+            </div>
+            <h1><a href="{{ url_for('index') }}" class="header-link">BlockCarbon</a></h1>
+        </div>
+        <div class="developer-attribution">
+            <span>Developed by Students at UMB</span>
+        </div>
+    </header>
+
+    <hr class="header-line">
+
+    <section id="error-section">
+        <div class="error-box">
+            <h2>Error</h2>
+            <p>{{ error_message }}</p>
+            <a href="{{ url_for('index') }}" class="back-button">Go Back</a>
+        </div>
+    </section>
+</body>
+
+</html>
