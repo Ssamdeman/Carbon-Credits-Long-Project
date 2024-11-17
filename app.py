@@ -118,6 +118,7 @@ def submit_coordinates():
         carbon_credits = additionality * 3.667
         print(carbon_credits)
 
+        # BEGIN TIME SERIES ANALYSIS
         # Define new classes for the COPERNICUS data
         landcover_classes_new = {
             1: {"name": "Saturated or defective", "color": "#ff0004"},   
@@ -128,7 +129,7 @@ def submit_coordinates():
             6: {"name": "Water", "color": "#0000ff"},
             7: {"name": "Clouds Low Probability", "color": "#818181"}
         }
-        
+
         # Import image collection for each year from Sentinel-2 data
         areas_collection = {}
         for year in range(2015, 2024):
