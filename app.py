@@ -118,6 +118,54 @@ def submit_coordinates():
         carbon_credits = additionality * 3.667
         print(carbon_credits)
 
+        # Define new classes for the COPERNICUS data
+        landcover_classes_new = {
+            1: {"name": "Saturated or defective", "color": "#ff0004"},   
+            2: {"name": "Dark Area Pixels", "color": "#868686"},               
+            3: {"name": "Cloud Shadows", "color": "#774b0a"},    
+            4: {"name": "Vegetation", "color": "#10d22c"},          
+            5: {"name": "Bare Soils", "color": "#ffff52"},             
+            6: {"name": "Water", "color": "#0000ff"},
+            7: {"name": "Clouds Low Probability", "color": "#818181"}
+        }
+        
+        # Import image collection for each year from Sentinel-2 data
+        areas_collection = {}
+        for year in range(2015, 2024):
+            landcover_collection_image = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED") \
+                .filter(ee.Filter.date(ee.Date.fromYMD(year, 1, 1), ee.Date.fromYMD(year, 1, 28))) \
+                .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 30)) \
+                .filterBounds(rectangle)
+
+            # Take a median composite to reduce noise
+            landcover_collection_image = landcover_collection_image.median()
+
+            # Get yearly area
+            areas_image = {}
+            for class_value, class_info in landcover_classes_new.items():
+                class_name = class_info["name"]
+
+                
+                # Check if the image has any bands before proceeding
+                if landcover_collection_image.bandNames().size().getInfo() == 0:
+                    areas_image[class_name] = 0
+                    continue
+
+                # Mask the image to isolate the current class
+                masked_class = landcover_collection_image.eq(class_value)
+
+                # Calculate area in square meters
+                area_image = masked_class.multiply(ee.Image.pixelArea()).reduceRegion(
+                    reducer=ee.Reducer.sum(),
+                    geometry=rectangle,
+                    scale=10,
+                    maxPixels=1e9
+                ).getInfo()
+
+                # Convert the area to hectares (1 hectare = 10,000 m²)
+                areas_image[class_name] = area_image['SCL'] / 10000 if area_image['SCL'] else 0
+            areas_collection[year] = areas_image
+
         return render_template('results.html',
                                image_url=image_url,
                                landcover_image_url=landcover_image_url,
@@ -130,7 +178,9 @@ def submit_coordinates():
                                current_carbon_stocks=current_carbon_stocks,
                                reforested_carbon_stocks=reforested_carbon_stocks,
                                additionality=additionality,
-                               carbon_credits=carbon_credits
+                               carbon_credits=carbon_credits,
+                               areas_collection=areas_collection,
+                               landcover_classes_new = landcover_classes_new
                                )
     except Exception as e:
         print("Error processing coordinates:", e)
