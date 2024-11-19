@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BlockCarbon Tool</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <header id="header">
+      <div class="left-header">
+        <div class="logo-container">
+          <img
+            src="{{ url_for('static', filename='images/BlockCarbon.png') }}"
+            alt="BlockCarbon Logo"
+            id="logo"
+          />
+        </div>
+        <h1>
+          <a href="{{ url_for('index') }}" class="header-link">BlockCarbon</a>
+        </h1>
+      </div>
+      <div class="developer-attribution">
+        <span>Developed by Students at UMB</span>
+      </div>
+    </header>
+
+    <hr class="header-line" />
+
+    <section id="coordinates-input">
+      <h2>Enter Project Area Coordinates</h2>
+      <form
+        id="coordinate-form"
+        action="{{ url_for('submit_coordinates') }}"
+        method="POST"
+      >
+        <div id="coordinates-container">
+          <div class="coordinate-group">
+            <label>Coordinates:</label>
+            <div class="input-group">
+              <input
+                type="number"
+                step="any"
+                name="latitude[]"
+                placeholder="Latitude"
+                required
+              />
+              <input
+                type="number"
+                step="any"
+                name="longitude[]"
+                placeholder="Longitude"
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="addCoordinate()">
+          Add Another Coordinate
+        </button>
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+    <script>
+      function addCoordinate() {
+        const container = document.getElementById("coordinates-container");
+        const newCoordinateGroup = document.createElement("div");
+        newCoordinateGroup.className = "coordinate-group";
+
+        newCoordinateGroup.innerHTML = `
+                <label>Coordinates:</label>
+                <div class="input-group">
+                    <input type="number" step="any" name="latitude[]" placeholder="Latitude" required>
+                    <input type="number" step="any" name="longitude[]" placeholder="Longitude" required>
+                </div>
+            `;
+
+        container.appendChild(newCoordinateGroup);
+      }
+      addCoordinate();
+      addCoordinate();
+    </script>
+  </body>
+</html>
