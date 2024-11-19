@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         imageElement.src = imageUrls[currentIndex];
     });
 
-    prevButton.addEventListener('click', () => {
+    prevButton.addEventListener('click', () =>   {
         currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
         imageElement.src = imageUrls[currentIndex];
     });
