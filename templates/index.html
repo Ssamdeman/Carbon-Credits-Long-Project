@@ -59,8 +59,13 @@
             </div>
           </div>
         </div>
-        <button type="button" onclick="addCoordinate()">
-          Add Another Coordinate
+        <button type="button" onclick="addCoordinate()">Add Coordinate</button>
+        <button
+          type="button"
+          id="delete-button"
+          onclick="deleteLastCoordinate()"
+        >
+          Delete Coordinate
         </button>
         <button type="submit">Submit</button>
       </form>
@@ -69,11 +74,12 @@
     <script>
       function addCoordinate() {
         const container = document.getElementById("coordinates-container");
+
         const newCoordinateGroup = document.createElement("div");
         newCoordinateGroup.className = "coordinate-group";
 
         newCoordinateGroup.innerHTML = `
-                <label>Coordinates:</label>
+                <label></label>
                 <div class="input-group">
                     <input type="number" step="any" name="latitude[]" placeholder="Latitude" required>
                     <input type="number" step="any" name="longitude[]" placeholder="Longitude" required>
@@ -81,7 +87,35 @@
             `;
 
         container.appendChild(newCoordinateGroup);
+
+        // Update delete button visibility
+        updateDeleteButtonVisibility();
       }
+
+      function deleteLastCoordinate() {
+        const container = document.getElementById("coordinates-container");
+        const coordinateGroups = document.querySelectorAll(".coordinate-group");
+
+        if (coordinateGroups.length > 3) {
+          // Remove the last coordinate group
+          container.removeChild(coordinateGroups[coordinateGroups.length - 1]);
+        } else {
+          alert("You must have at least 3 coordinate points.");
+        }
+
+        // Update delete button visibility
+        updateDeleteButtonVisibility();
+      }
+
+      function updateDeleteButtonVisibility() {
+        const coordinateGroups = document.querySelectorAll(".coordinate-group");
+        const deleteButton = document.getElementById("delete-button");
+
+        // Hide the delete button if there are only 3 coordinate groups
+        deleteButton.style.display =
+          coordinateGroups.length > 3 ? "inline-block" : "none";
+      }
+
       addCoordinate();
       addCoordinate();
     </script>
