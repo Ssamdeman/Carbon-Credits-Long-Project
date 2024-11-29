@@ -38,6 +38,14 @@
                 <input type="number" step="any" name="bottom_right_longitude" placeholder="Longitude" required>
             </div>
 
+            {% for class_value, class_info in landcover_classes.items() %}
+            <label>
+                <input type="checkbox" name="class_{{ class_value }}">
+                {{ class_info.name }}
+            </label><br>
+            {% endfor %}
+            
+
             <button type="submit">Submit</button>
         </form>
     </section>
