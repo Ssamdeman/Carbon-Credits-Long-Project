@@ -9,8 +9,12 @@ try:
 except ee.EEException as e:
     print("Google Earth Engine initialization error:", e)
 
+
+
 # Define land cover classes and their corresponding colors
 landcover_classes = {
+
+    
     10: {"name": "Tree Cover", "color": "#006400"},               # Dark Green
     20: {"name": "Shrubland", "color": "#228B22"},                # Forest Green
     30: {"name": "Grassland", "color": "#7CFC00"},                # Lawn Green
@@ -24,7 +28,7 @@ landcover_classes = {
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', landcover_classes=landcover_classes)
 
 @app.route('/submit_coordinates', methods=['POST'])
 def submit_coordinates():
@@ -51,6 +55,23 @@ def submit_coordinates():
             .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 30)) \
             .filter(ee.Filter.date('2021-01-01', '2021-12-31')) \
             .filterBounds(rectangle)
+
+
+
+        ############################################################################################################################################################
+
+
+        # Gets the selected classes from the front and formats it
+        selected_classes = [int(key.split('_')[1]) for key in data if key.startswith('class_')]
+
+
+        
+
+       
+        
+
+
+
         
         # Take a median composite of the image and visualize it
         composite = s2.median().visualize(bands=['B4', 'B3', 'B2'], min=0, max=3000)
@@ -58,13 +79,63 @@ def submit_coordinates():
 
         # Load and visualize the ESA WorldCover data
         landcover = ee.Image('ESA/WorldCover/v100/2020')
+        
+        
+        
+        # If classes are selected, create a mask for selected classes
+        if selected_classes:
+            mask = landcover.eq(selected_classes[0])  # Start with the first selected class
+            
+            for class_value in selected_classes[1:]:
+                mask = mask.Or(landcover.eq(class_value))
+            filtered_landcover = landcover.updateMask(mask)
+            
+        else:
+            # If no classes selected, default to all classes
+            filtered_landcover = landcover
+
+
+        
+
+        #checks if selected class was passed properly
+        if any(isinstance(cls, list) for cls in selected_classes):
+            raise ValueError("selected_classes contains invalid nested lists.")                          ##############right now, the selected classes have sub list for some reason, and they are not being accepted in the next step, figure out why (done)
+
+
+
+
+         # Define a separate palette for each selected class
+        
+        palette = [landcover_classes[class_value]["color"] for class_value in selected_classes]
+
+        # Set the 'min' and 'max' values to cover the range of classes
         landcoverVis = {
-            'min': 10,
-            'max': 90,
-            'palette': [class_info["color"] for class_info in landcover_classes.values()]
+            'min': min(selected_classes),
+            'max': max(selected_classes),
+            'palette': palette
+            ##  'opacity': 0.7  # Apply opacity to the visible landcover
         }
-        landcover_image = landcover.clip(rectangle).visualize(**landcoverVis)
-        landcover_image_url = landcover_image.getThumbURL({'region': rectangle, 'dimensions': 500})
+                    
+        
+        
+        
+        
+        print("test reached.") ##if reached, crash happened after this
+
+
+        landcover_image = filtered_landcover.clip(rectangle).visualize(**landcoverVis)
+
+        combined_image = ee.ImageCollection([composite, landcover_image]).mosaic()  # Overlay land cover on satellite map
+
+        landcover_image_url = combined_image.getThumbURL({'region': rectangle, 'dimensions': 500})
+
+
+
+
+
+        ###########################################################################################################################################
+
+
 
         # Calculate the area for each landcover class
         areas = {}
@@ -85,6 +156,7 @@ def submit_coordinates():
             # Convert the area to hectares (1 hectare = 10,000 m²)
             areas[class_name] = area['Map'] / 10000 if area['Map'] else 0
 
+   
         return render_template('results.html',
                                image_url=image_url,
                                landcover_image_url=landcover_image_url,
@@ -93,10 +165,14 @@ def submit_coordinates():
                                bottom_lat=bottom_lat,
                                right_lon=right_lon,
                                landcover_classes=landcover_classes,
+                                selected_classes=selected_classes,
                                landcover_areas=areas)
+    
+
     except Exception as e:
         print("Error processing coordinates:", e)
         return render_template('error.html', error_message='An error occurred while processing the coordinates.')
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
