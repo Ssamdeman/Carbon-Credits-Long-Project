@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlockCarbon Tool</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles/style.css') }}"
-    />
-  </head>
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>BlockCarbon Tool</title>
+      <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='styles/style.css') }}"
+      />
+    </head>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles/style.css') }}"
@@ -19,23 +19,7 @@
   </head>
 
   <body>
-  <body>
     <header id="header">
-      <div class="left-header">
-        <div class="logo-container">
-          <img
-            src="{{ url_for('static', filename='images/BlockCarbon.png') }}"
-            alt="BlockCarbon Logo"
-            id="logo"
-          />
-        </div>
-        <h1>
-          <a href="{{ url_for('index') }}" class="header-link">BlockCarbon</a>
-        </h1>
-      </div>
-      <div class="developer-attribution">
-        <span>Developed by Students at UMB</span>
-      </div>
       <div class="left-header">
         <div class="logo-container">
           <img
@@ -54,10 +38,16 @@
     </header>
 
     <hr class="header-line" />
-    <hr class="header-line" />
 
     <section id="coordinates-input">
       <h2>Enter Project Area Coordinates</h2>
+
+      <h3>Upload a KML File</h3>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="kml_file" accept=".kml" required />
+        <button type="submit">Upload</button>
+      </form>
+
       <form
         id="coordinate-form"
         action="{{ url_for('submit_coordinates') }}"
@@ -95,7 +85,6 @@
         <button type="submit">Submit</button>
       </form>
     </section>
-
     <script>
       function addCoordinate() {
         const container = document.getElementById("coordinates-container");
@@ -146,4 +135,3 @@
     </script>
   </body>
 </html>
-
