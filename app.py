@@ -73,8 +73,6 @@ app = Flask(__name__)
 # Set up Earth Engine authentication
 try:
     credentials = ee.ServiceAccountCredentials(
-        #'ding-22@ordinal-reason-440501-p5.iam.gserviceaccount.com',
-        #'/Users/williamding/Documents/GitHub/Carbon-Credits-Long-Project/keys/ordinal-reason-440501-p5-7fd661e0c0ad.json'
     )
     ee.Initialize(credentials)
 except ee.EEException as e:
