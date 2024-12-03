@@ -1,5 +1,53 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import ee
+import os
+
+app = Flask(__name__)
+
+# Set upload folder
+UPLOAD_FOLDER = 'uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/results.html', methods=['POST'])
+def upload_kml():
+    # Check if a file was uploaded
+    if 'kml_file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files['kml_file']
+
+    # Check if the file has a valid name
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    if file and file.filename.endswith('.kml'):
+        # Save the file
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(filepath)
+
+        # Process the KML file (parse it)
+        try:
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+
+            # Extract some data from the KML file (example: placemarks)
+            placemarks = []
+            for placemark in root.findall('.//{http://www.opengis.net/kml/2.2}Placemark'):
+                name = placemark.find('{http://www.opengis.net/kml/2.2}name')
+                if name is not None:
+                    placemarks.append(name.text)
+
+            return jsonify({
+                "message": "File uploaded and processed successfully",
+                "placemarks": placemarks
+            }), 200
+        except ET.ParseError:
+            return jsonify({"error": "Failed to parse KML file"}), 400
+
+    return jsonify({"error": "Invalid file type. Only .kml files are allowed."}), 400
+
+
 
 def calculate_carbon_stocks(areas):
 # Calculates carbon stocks of project area using averages for each land feature
