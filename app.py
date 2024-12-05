@@ -155,6 +155,47 @@ def submit_coordinates():
         for year in range(10):
             carbon_credits_earned.append(carbon_stock_changes[year] * (44/12))
 
+         ### BEGIN TIME SERIES ANALYSIS ###
+
+        # Import image collection for each year from Sentinel-2 data
+        areas_collection = {}
+        for year in range(2013, 2024):
+            landsat7 = ee.ImageCollection("LANDSAT/LE07/C02/T1_L2") \
+                .filter(ee.Filter.date(ee.Date.fromYMD(year, 1, 1), ee.Date.fromYMD(year, 12, 31))) \
+                .filter(ee.Filter.lt('CLOUD_COVER', 30)) \
+                .filterBounds(rectangle)
+            
+            # Function to calculate NDVI
+            def calculate_ndvi(image):
+                ndvi = image.normalizedDifference(['SR_B4', 'SR_B3']).rename('NDVI')  # NIR (B4), Red (B3)
+                return image.addBands(ndvi)
+
+            # Apply NDVI calculation to the image collection
+            landsat7_ndvi = landsat7.map(calculate_ndvi)
+
+            # Take a median composite to reduce noise
+            median_landsat7 = landsat7_ndvi.select('NDVI').median().clip(rectangle)
+
+            # Threshold NDVI to classify vegetation (e.g., NDVI > 0.3)
+            vegetation_mask = median_landsat7.gt(0.3)
+
+            # Calculate the area of vegetation
+            # Pixel area in square meters
+            pixel_area = median_landsat7.pixelArea().divide(10000)
+
+            # Mask areas that are classified as vegetation
+            vegetation_area = pixel_area.updateMask(vegetation_mask)
+
+            # Calculate the total vegetation area in the ROI
+            vegetation_area_sum = vegetation_area.reduceRegion(
+                reducer=ee.Reducer.sum(),
+                geometry=rectangle,
+                scale=30,
+                maxPixels=1e9
+            )
+
+            print(f"Year: {year}", "Vegetation Area (sq meters):", vegetation_area_sum.getInfo())
+            
         return render_template('results.html',
                                image_url=image_url,
                                landcover_image_url=landcover_image_url,
