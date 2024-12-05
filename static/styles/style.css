@@ -1,3 +1,4 @@
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -17,6 +18,7 @@ body {
     width: 100%;
 }
 
+/* Header Styles */
 a {
     color: inherit;
     text-decoration: none;
@@ -49,12 +51,14 @@ header {
 
 h1 {
     font-size: 2rem;
-    color: #e0e0e0;
+    color: #ffffff;
+    /* Header text color set to white */
     margin-left: 10px;
 }
 
 .header-link {
-    color: #e0e0e0;
+    color: #ffffff;
+    /* Header link color set to white */
     text-decoration: none;
 }
 
@@ -72,39 +76,42 @@ h1 {
     height: 1px;
     background: #333;
     margin: 0;
-    margin-bottom: 250px;
+    margin-bottom: 50px;
 }
 
+/* Main Sections */
 #coordinates-input,
 #results-section,
 #error-section {
-    margin-top: 55px;
     background-color: #1e1e1e;
     padding: 45px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 800px;
+    width: 90%;
+    max-width: 1600px;
     margin: 20px 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
 }
 
 #results-section {
-    max-width: 1400px;
-
+    max-width: 1600px;
 }
 
+/* Section Headings */
 #coordinates-input h2,
 .coordinates-box h3,
 .legend h3,
-.error-box h2 {
+.error-box h2,
+.calculation-explanation h3 {
     font-size: 1.5rem;
-    color: #ffffff;
+    color: #bb86fc;
+    /* Purple accent color */
     margin-bottom: 15px;
 }
 
+/* Form Styling */
 form {
     display: flex;
     flex-direction: column;
@@ -144,7 +151,8 @@ input[type="number"]::placeholder {
 button {
     padding: 12px 25px;
     margin-top: 25px;
-    background-color: #6200ea;
+    background-color: #bb86fc;
+    /* Purple accent color */
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -154,14 +162,19 @@ button {
 }
 
 button:hover {
-    background-color: #3700b3;
+    background-color: #9a6fd8;
+    /* Darker purple on hover */
 }
 
+/* Coordinates Display */
 .coordinates-box {
-    width: 350px;
     background-color: #2c2c2c;
     padding: 25px;
-    border-radius: 18px;
+    border-radius: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .coordinates-box h3,
@@ -170,22 +183,61 @@ button:hover {
     color: #ffffff;
 }
 
-.layout-container {
+/* Results Layout */
+.main-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
-    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    /* Reduced gap for better alignment */
     width: 100%;
-    padding: 20px 40px;
+    padding: 20px 0;
 }
 
+.left-column,
+.center-column,
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.left-column,
+.right-column {
+    width: 25%;
+    /* Adjusted for symmetry */
+}
+
+.center-column {
+    width: 50%;
+    /* Center column wider for the image */
+    display: flex;
+    justify-content: center;
+}
+
+/* Ensuring Coordinates and Legend are the same height */
+.left-column .coordinates-box,
+.left-column .legend {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.left-column .legend {
+    margin-top: 20px;
+}
+
+/* Image Carousel */
 .image-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 50px;
-    flex-grow: 1;
+    position: relative;
+    top: 22%;
+    left: -5%;
+    width: 800px;
+    height: 600px;
 }
 
 .image-carousel {
@@ -195,48 +247,100 @@ button:hover {
 }
 
 #satellite-image {
-    max-width: 1000px;
-
-    max-height: 600px;
+    max-width: 5000px;
+    max-height: 800px;
     border: 3px solid #333;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     object-fit: cover;
+    position: relative; /* Add positioning context */
+
+    
+}
+/* adding the icon */
+.loading-icon {
+    position: absolute;
+    top: 47%;
+    left: 48%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1;
 }
 
-button#prev-button,
-button#next-button {
-    background-color: #6200ea;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+
+
+.image-carousel button#prev-button,
+.image-carousel button#next-button {
+    background-color: #bb86fc;
+    /* Purple accent color */
     color: #ffffff;
     border: none;
     border-radius: 50%;
-    width: 40px;
-
-    height: 40px;
-    font-size: 1.2rem;
+    width: 50px;
+    /* Increased size for better visibility */
+    height: 50px;
+    /* Ensure height matches width for perfect circle */
+    font-size: 1.5rem;
+    /* Increased font size for better visibility */
     cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    /* Flexbox properties for centering */
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.3s ease;
 }
 
-button#prev-button:hover,
-button#next-button:hover {
-    background-color: #3700b3;
+.image-carousel button#prev-button {
+    left: 80px;
+    /* Increased spacing between arrow and image */
 }
 
+.image-carousel button#next-button {
+    right: 80px;
+    /* Increased spacing between arrow and image */
+}
+
+.image-carousel button#prev-button:hover,
+.image-carousel button#next-button:hover {
+    background-color: #9a6fd8;
+    /* Darker purple on hover */
+}
+
+/* Legend Styles */
 .legend {
-    width: 300px;
     background-color: #2c2c2c;
     padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .legend h3 {
     margin-bottom: 10px;
-    color: #ffffff;
+    color: #bb86fc;
+    /* Purple accent color */
     text-align: center;
 }
 
@@ -259,6 +363,72 @@ button#next-button:hover {
     color: #dddddd;
 }
 
+/* Data Table Styles */
+.data-table {
+    width: 100%;
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    /* Enable horizontal scrolling if needed */
+}
+
+.data-table h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #bb86fc;
+    /* Purple accent color */
+}
+
+.data-table table {
+    width: 100%;
+    /* Ensures the table takes full width of its container */
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #444;
+    color: #e0e0e0;
+}
+
+.data-table th {
+    background-color: #1e1e1e;
+    font-size: 1.1rem;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
+
+.data-table tr:hover {
+    background-color: #3a3a3a;
+}
+
+/* Calculation Explanation */
+.calculation-explanation {
+    margin-top: 40px;
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 1400px;
+}
+
+.calculation-explanation h3 {
+    color: #bb86fc;
+    /* Purple accent color */
+}
+
+.calculation-explanation p {
+    color: #e0e0e0;
+    margin-top: 10px;
+    line-height: 1.6;
+}
+
+/* Error Box */
 .error-box {
     background-color: #2c2c2c;
     padding: 20px;
@@ -270,7 +440,8 @@ button#next-button:hover {
     display: inline-block;
     margin-top: 15px;
     padding: 10px 20px;
-    background-color: #6200ea;
+    background-color: #bb86fc;
+    /* Purple accent color */
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -280,54 +451,74 @@ button#next-button:hover {
 }
 
 .back-button:hover {
-    background-color: #3700b3;
+    background-color: #9a6fd8;
+    /* Darker purple on hover */
 }
 
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
 
-@media (min-width: 1201px) {
-
-    .header-line {
+    .left-column,
+    .center-column,
+    .right-column {
         width: 100%;
     }
 
-    .layout-container {
-        justify-content: center;
+    .left-column {
+        flex-direction: row;
+        justify-content: space-between;
     }
 
-    .coordinates-box,
-    .legend {
-        align-self: center;
+    .left-column .coordinates-box,
+    .left-column .legend {
+        width: 48%;
+        margin: 0;
+    }
+
+    .center-column {
+        margin-top: 30px;
+    }
+
+    .right-column {
+        margin-top: 30px;
+    }
+
+    .image-carousel button#prev-button,
+    .image-carousel button#next-button {
+        position: static;
+        transform: none;
+        margin-top: 20px;
     }
 }
 
-@media (max-width: 1200px) {
-    .layout-container {
-        padding: 20px 40px;
-    }
-}
-
-@media (max-width: 900px) {
-    .image-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
-
-    }
-
-    .legend {
-        width: 250px;
-
-    }
-
+@media (max-width: 800px) {
     #satellite-image {
         max-width: 100%;
-        height: auto;
+    }
+
+    .left-column .coordinates-box,
+    .left-column .legend {
+        width: 100%;
+    }
+
+    .left-column {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .image-carousel button#prev-button,
+    .image-carousel button#next-button {
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
     }
 }
 
 @media (max-width: 600px) {
-
-
     #logo {
         width: 60px;
     }
@@ -341,7 +532,6 @@ button#next-button:hover {
     #error-section {
         padding: 20px;
         max-width: 100%;
-
     }
 
     form {
@@ -371,10 +561,16 @@ button#next-button:hover {
         font-size: 0.9rem;
     }
 
-    button#prev-button,
-    button#next-button {
-        width: 30px;
-        height: 30px;
+    .data-table th,
+    .data-table td {
+        padding: 8px 10px;
+    }
+
+    .data-table th {
         font-size: 1rem;
+    }
+
+    .data-table td {
+        font-size: 0.9rem;
     }
 }

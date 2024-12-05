@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <!-- Header Section -->
     <header id="header">
         <div class="left-header">
             <div class="logo-container">
@@ -23,20 +24,15 @@
 
     <hr class="header-line">
 
+    <!-- Results Section -->
     <section id="results-section">
-        <div class="layout-container">
-            <div id="coordinates-display" class="coordinates-box">
-                <h3>Coordinates:</h3>
-                <p>Top-Left: ({{ top_lat }}, {{ left_lon }})</p>
-                <p>Bottom-Right: ({{ bottom_lat }}, {{ right_lon }})</p>
-            </div>
-
-            <div class="image-container">
-                <div class="image-carousel">
-                    <button id="prev-button">&#9664;</button>
-                    <img id="satellite-image" src="{{ image_url }}" alt="Satellite View"
-                        data-satellite-url="{{ image_url }}" data-landcover-url="{{ landcover_image_url }}">
-                    <button id="next-button">&#9654;</button>
+        <div class="main-container">
+            <!-- Left Column: Coordinates and Legend -->
+            <div class="left-column">
+                <div id="coordinates-display" class="coordinates-box">
+                    <h3>Coordinates:</h3>
+                    <p>Top-Left: ({{ top_lat }}, {{ left_lon }})</p>
+                    <p>Bottom-Right: ({{ bottom_lat }}, {{ right_lon }})</p>
                 </div>
 
                 <div id="legend" class="legend">
@@ -53,6 +49,53 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Center Column: Image Carousel -->
+            <div class="center-column">
+                <div class="image-container">
+                    <div class="image-carousel">
+                        <button id="prev-button" aria-label="Previous Image">&#9664;</button>
+                        <img id="satellite-image" src="{{ image_url }}" alt="Satellite View"
+                            data-satellite-url="{{ image_url }}" data-landcover-url="{{ landcover_image_url }}">
+                        <button id="next-button" aria-label="Next Image">&#9654;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Data Table -->
+            <div class="right-column">
+                <div class="data-table">
+                    <h3>Carbon Stock Changes and Credits Earned (Years 1-10)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Carbon Stock Change (tC)</th>
+                                <th>Carbon Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(10) %}
+                            <tr>
+                                <td>{{ i + 1 }}</td>
+                                <td>{{ carbon_stock_changes[i] | round(2) }}</td>
+                                <td>{{ carbon_credits_earned[i] | round(2) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculation Explanation Section -->
+        <div class="calculation-explanation">
+            <h3>How Carbon Stock Changes and Credits are Calculated:</h3>
+            <p>The carbon stock changes (tC) represent the estimated amount of carbon sequestered or emitted over time
+                within the selected area. The carbon credits are calculated based on the carbon stock changes and
+                reflect potential earnings from carbon trading markets.</p>
+            <p>These calculations consider factors such as land cover type, biomass density, growth rates, and carbon
+                pricing.</p>
         </div>
     </section>
 
