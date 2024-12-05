@@ -162,7 +162,7 @@ def submit_coordinates():
         for year in range(2013, 2024):
             landsat7 = ee.ImageCollection("LANDSAT/LE07/C02/T1_L2") \
                 .filter(ee.Filter.date(ee.Date.fromYMD(year, 1, 1), ee.Date.fromYMD(year, 12, 31))) \
-                .filter(ee.Filter.lt('CLOUD_COVER', 30)) \
+                .filter(ee.Filter.lt('CLOUD_COVER', 20)) \
                 .filterBounds(rectangle)
             
             # Function to calculate NDVI
@@ -177,7 +177,7 @@ def submit_coordinates():
             median_landsat7 = landsat7_ndvi.select('NDVI').median().clip(rectangle)
 
             # Threshold NDVI to classify vegetation (e.g., NDVI > 0.3)
-            vegetation_mask = median_landsat7.gt(0.3)
+            vegetation_mask = median_landsat7.gt(0.2)
 
             # Calculate the area of vegetation
             # Pixel area in square meters
