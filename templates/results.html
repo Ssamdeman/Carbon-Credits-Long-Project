@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlockCarbon Tool - Results</title>
+    <title>BlockCarbon Results</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles/style.css') }}"
@@ -31,52 +31,75 @@
 
     <hr class="header-line" />
 
-    <section id="results-section">
-      <div class="layout-container">
-        <div id="coordinates-display" class="coordinates-box">
-          <h3>Coordinates:</h3>
-          <p>coordinates</p>
-          <!--<p>Top-Left: ({{ top_lat }}, {{ left_lon }})</p>
-          <p>Bottom-Right: ({{ bottom_lat }}, {{ right_lon }})</p>-->
-        </div>
+    <main>
+      <h2>Analysis Results</h2>
 
-        <div class="image-container">
-          <div class="image-carousel">
-            <button id="prev-button">&#9664;</button>
+      {% for result in results %}
+      <section class="polygon-result">
+        <h3>Polygon {{ loop.index }}</h3>
+
+        <div class="images-container">
+          <div class="image-box">
+            <h4>Satellite Image</h4>
+            <img src="{{ result.image_url }}" alt="Satellite Image" />
+          </div>
+          <div class="image-box">
+            <h4>Land Cover Classification</h4>
             <img
-              id="satellite-image"
-              src="{{ image_url }}"
-              alt="Satellite View"
-              data-satellite-url="{{ image_url }}"
-              data-landcover-url="{{ landcover_image_url }}"
+              src="{{ result.landcover_image_url }}"
+              alt="Land Cover Classification"
             />
-            <button id="next-button">&#9654;</button>
-          </div>
-
-          <div id="legend" class="legend">
-            <h3>Land Cover Legend</h3>
-            <div id="legend-items">
-              {% for key, class_info in landcover_classes.items() %}
-              <div class="legend-item">
-                <span
-                  class="legend-color"
-                  style="background-color: '{{ class_info.color }}'"
-                ></span>
-                <span class="legend-label">
-                  {{ class_info.name }} - {{ landcover_areas[class_info.name] |
-                  round(2) }} ha
-                </span>
-              </div>
-              {% endfor %}
-            </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <script
-      src="{{ url_for('static', filename='scripts/script.js') }}"
-      defer
-    ></script>
+        <div class="results-data">
+          <h4>Land Cover Distribution</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Land Cover Type</th>
+                <th>Area (hectares)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for class_name, area in result.areas.items() %}
+              <tr>
+                <td>{{ class_name }}</td>
+                <td>{{ "%.2f"|format(area) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <h4>Carbon Stock Analysis</h4>
+          <table>
+            <tr>
+              <td>Current Carbon Stocks:</td>
+              <td>{{ "%.2f"|format(result.current_carbon_stocks) }} tC</td>
+            </tr>
+            <tr>
+              <td>Potential Carbon Stocks after Reforestation:</td>
+              <td>{{ "%.2f"|format(result.reforested_carbon_stocks) }} tC</td>
+            </tr>
+            <tr>
+              <td>Carbon Stock Additionality:</td>
+              <td>{{ "%.2f"|format(result.additionality) }} tC</td>
+            </tr>
+            <tr>
+              <td>Potential Carbon Credits:</td>
+              <td>{{ "%.2f"|format(result.carbon_credits) }} credits</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      {% if not loop.last %}
+      <hr class="section-divider" />
+      {% endif %} {% endfor %}
+
+      <div class="actions">
+        <a href="{{ url_for('index') }}" class="button">Analyze Another Area</a>
+      </div>
+    </main>
   </body>
 </html>

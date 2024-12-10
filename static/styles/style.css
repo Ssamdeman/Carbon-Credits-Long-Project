@@ -370,3 +370,71 @@ button#next-button:hover {
     font-size: 1rem;
   }
 }
+
+.polygon-result {
+  margin: 2rem 0;
+  padding: 1rem;
+}
+
+.images-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.image-box {
+  text-align: center;
+}
+
+.image-box img {
+  max-width: 500px;
+  height: auto;
+}
+
+.results-data {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f5f5f5;
+}
+
+.section-divider {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.actions {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
