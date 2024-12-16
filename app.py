@@ -256,9 +256,9 @@ def submit_coordinates():
             'region': rectangle,
             'dimensions': 500,
         })
-        # print("Grid image URL:", grid_image_url) -->> ## for testing
-        # for cell_id, info in grid_info.items(): ### for testing
-        #     print(f"Grid {cell_id} area: {info['area']:.2f} hectares")
+        print("Project Land:", grid_image_url)  ## for testing
+        for cell_id, info in grid_info.items(): ### for testing
+            print(f"Grid {cell_id} area: {info['area']:.2f} hectares")
 
 
 
@@ -285,7 +285,7 @@ def submit_coordinates():
         })
 
         # Print expanded grid areas
-        print(expanded_grid_image_url)
+        print ("Controlled Land : ", expanded_grid_image_url)
         for cell_id, info in expanded_grid_info.items():
             print(f"Expanded Grid {cell_id} area: {info['area']:.2f} hectares")
 
