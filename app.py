@@ -86,6 +86,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/submit_coordinates', methods=['POST'])
+
 def submit_coordinates():
     data = request.form
     try:
@@ -101,8 +102,120 @@ def submit_coordinates():
         left_lon = min(top_left_lon, bottom_right_lon)
         right_lon = max(top_left_lon, bottom_right_lon)
 
+        ## Adding validation of gride size for 
+        area_in_hectares = abs((top_lat - bottom_lat) * (right_lon - left_lon)) * 111.32 * 111.32 * 100
+
+        if area_in_hectares < 10:  # 1 hectare minimum
+            raise ValueError("Selected area too small. Minimum 1 hectare required.")
+        if area_in_hectares > 10000:  # 10,000 hectare maximum 
+            raise ValueError("Selected area too large. Maximum 10,000 hectares allowed.")
+
+        # Calculate center point of original area
+        center_lat = (top_lat + bottom_lat) / 2
+        center_lon = (left_lon + right_lon) / 2
+
+        # Calculate original dimensions
+        original_height = top_lat - bottom_lat
+        original_width = right_lon - left_lon
+
+        # Calculate expanded coordinates (2x bigger)
+        expanded_top_lat = center_lat + (original_height)  # Double the distance from center
+        expanded_bottom_lat = center_lat - (original_height)
+        expanded_left_lon = center_lon - (original_width)
+        expanded_right_lon = center_lon + (original_width)
+        
+        # Create expanded rectangle geometry
+        expanded_rectangle = ee.Geometry.Rectangle([
+        expanded_left_lon, expanded_bottom_lat, 
+        expanded_right_lon, expanded_top_lat
+        ])
+
+        # Calculate grid for expanded area (3x3)
+        expanded_width = abs(expanded_right_lon - expanded_left_lon)
+        expanded_height = abs(expanded_top_lat - expanded_bottom_lat)
+        expanded_cell_width = expanded_width / 3
+        expanded_cell_height = expanded_height / 3
+
+       
         # Create the Rectangle geometry
         rectangle = ee.Geometry.Rectangle([left_lon, bottom_lat, right_lon, top_lat])
+
+        # Add grid calculation here
+        total_width = abs(right_lon - left_lon) 
+        total_height = abs(top_lat - bottom_lat)
+        cell_width = total_width / 3  # For 3x3 grid
+        cell_height = total_height / 3 # For 3x3 grid 
+       
+
+        # Before grid cells creation, create dictionary to store cell info
+        grid_info = {}
+
+        # Modify grid cells creation loop
+        grid_cells = []
+        for i in range(3):  # rows
+            for j in range(3):  # columns
+                cell_left = left_lon + (j * cell_width)
+                cell_right = cell_left + cell_width
+                cell_top = top_lat - (i * cell_height)
+                cell_bottom = cell_top - cell_height
+                
+                # Create cell identifier (A1, A2, etc)
+                cell_id = f"{chr(65+i)}{j+1}"  # A1, A2, A3, B1, B2...
+                
+                # Calculate cell area in hectares
+                cell_area = abs((cell_top - cell_bottom) * (cell_right - cell_left)) * 111.32 * 111.32 * 100
+                
+                cell = ee.Geometry.Rectangle([cell_left, cell_bottom, cell_right, cell_top])
+                grid_cells.append(cell)
+                
+                # Store cell info
+                grid_info[cell_id] = {
+                    "geometry": cell,
+                    "area": cell_area,
+                    "coordinates": {
+                        "top": cell_top,
+                        "bottom": cell_bottom,
+                        "left": cell_left,
+                        "right": cell_right
+                    }
+                }
+
+
+        # Create grid cells for expanded area
+        expanded_grid_cells = []
+        expanded_grid_info = {} 
+        # Create expanded grid cells with area calculations
+        for i in range(3):  # rows
+            for j in range(3):  # columns
+                cell_left = expanded_left_lon + (j * expanded_cell_width)
+                cell_right = cell_left + expanded_cell_width
+                cell_top = expanded_top_lat - (i * expanded_cell_height)
+                cell_bottom = cell_top - expanded_cell_height
+                
+                # Create cell identifier
+                cell_id = f"E{chr(65+i)}{j+1}"  # EA1, EA2, EA3, EB1... ('E' for expanded)
+                
+                # Calculate cell area
+                cell_area = abs((cell_top - cell_bottom) * (cell_right - cell_left)) * 111.32 * 111.32 * 100
+                
+                cell = ee.Geometry.Rectangle([cell_left, cell_bottom, cell_right, cell_top])
+                expanded_grid_cells.append(cell)
+                
+                # Store expanded cell info
+                expanded_grid_info[cell_id] = {
+                    "geometry": cell,
+                    "area": cell_area,
+                    "coordinates": {
+                        "top": cell_top,
+                        "bottom": cell_bottom,
+                        "left": cell_left,
+                        "right": cell_right
+                    }
+                }
+
+
+
+
 
         # Fetch and process the satellite image using GEE
         s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') \
@@ -121,6 +234,67 @@ def submit_coordinates():
             'max': 90,
             'palette': [class_info["color"] for class_info in landcover_classes.values()]
         }
+
+        # Enhanced satellite image
+        grid_s2 = s2.median().visualize(bands=['B4', 'B3', 'B2'], min=0, max=3000)
+        grid_image_url = grid_s2.getThumbURL({
+            'region': rectangle, 
+            'dimensions': 500,
+        })
+
+        # Add grid overlay
+        grid_overlay = ee.FeatureCollection(grid_cells)
+        grid_vis = grid_overlay.style(**{'color': 'red', 'fillColor': '00000000'})
+
+        # Add grid overlay to the image
+        satellite_with_grid = ee.ImageCollection([
+            grid_s2,  # Use the already visualized image
+            grid_vis.visualize()
+        ]).mosaic()
+
+        grid_image_url = satellite_with_grid.getThumbURL({
+            'region': rectangle,
+            'dimensions': 500,
+        })
+        # print("Grid image URL:", grid_image_url) -->> ## for testing
+        # for cell_id, info in grid_info.items(): ### for testing
+        #     print(f"Grid {cell_id} area: {info['area']:.2f} hectares")
+
+
+
+        # Get satellite image for expanded area
+        expanded_s2 = s2.median().visualize(bands=['B4', 'B3', 'B2'], min=0, max=3000)
+        expanded_image_url = expanded_s2.getThumbURL({
+            'region': expanded_rectangle, 
+            'dimensions': 500,
+        })
+
+        # Add grid overlay to expanded image
+        expanded_grid_overlay = ee.FeatureCollection(expanded_grid_cells)
+        expanded_grid_vis = expanded_grid_overlay.style(**{'color': 'red', 'fillColor': '00000000'})
+
+        # Combine expanded satellite image with grid
+        expanded_satellite_with_grid = ee.ImageCollection([
+            expanded_s2,
+            expanded_grid_vis.visualize()
+        ]).mosaic()
+
+        expanded_grid_image_url = expanded_satellite_with_grid.getThumbURL({
+            'region': expanded_rectangle,
+            'dimensions': 500,
+        })
+
+        # Print expanded grid areas
+        print(expanded_grid_image_url)
+        for cell_id, info in expanded_grid_info.items():
+            print(f"Expanded Grid {cell_id} area: {info['area']:.2f} hectares")
+
+
+
+
+
+
+        ##orginal code witout grid.
         landcover_image = landcover.clip(rectangle).visualize(**landcoverVis)
         landcover_image_url = landcover_image.getThumbURL({'region': rectangle, 'dimensions': 500})
 
@@ -145,16 +319,22 @@ def submit_coordinates():
 
         baseline = calculate_baseline(areas)
 
+
         # Calculate carbon stock changes (tC) in years 1-10
         carbon_stock_changes = []
         for year in range(1, 11):
             carbon_stock_changes.append(carbon_stock_change(year, 150, 0.1, 0.1, 0.25, areas, baseline))
         
+
         # Calculate carbon credits earned in years 1-10
         carbon_credits_earned = []
         for year in range(10):
             carbon_credits_earned.append(carbon_stock_changes[year] * (44/12))
 
+
+
+
+        ## display the results in the results.html template
         return render_template('results.html',
                                image_url=image_url,
                                landcover_image_url=landcover_image_url,
